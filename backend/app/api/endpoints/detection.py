@@ -122,11 +122,16 @@ async def perform_detection(file_path: str, detection_type: str, confidence_thre
         else:
             raise InferenceError("unknown", f"Unknown detection type: {detection_type}")
         
+        if result.get("error") and result.get("status_code"):
+            raise HTTPException(status_code=result["status_code"], detail=result["error"])
+
         processing_time = time.time() - start_time
         result["processing_time"] = processing_time
         
         return result
         
+    except HTTPException: # Add this to re-raise HTTPExceptions
+        raise
     except Exception as e:
         logger.error(f"Detection failed for {file_path}: {str(e)}")
         raise InferenceError(detection_type, str(e))
@@ -189,7 +194,8 @@ async def detect_deepfake(request: DetectionRequest):
     except InferenceError as e:
         logger.error(f"Inference error: {e.message}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+    except HTTPException as e: # Add this block to re-raise HTTPExceptions
+        raise
     except Exception as e:
         logger.error(f"Unexpected error during detection: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error during detection")

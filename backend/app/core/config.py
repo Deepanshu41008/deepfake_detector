@@ -4,6 +4,7 @@ Configuration settings for the Deepfake Detection API
 
 import os
 from typing import List, Optional
+from pathlib import Path # Added
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
 
@@ -29,13 +30,18 @@ class Settings(BaseSettings):
     ALLOWED_IMAGE_EXTENSIONS: List[str] = [".jpg", ".jpeg", ".png", ".bmp", ".tiff"]
     ALLOWED_AUDIO_EXTENSIONS: List[str] = [".wav", ".mp3", ".flac", ".ogg", ".m4a"]
     
-    UPLOAD_DIR: str = "uploads"
+    # Base directory for backend-relative paths
+    # Assuming this config.py is in backend/app/core/
+    # So, BACKEND_DIR will point to /app/backend/
+    BACKEND_DIR: Path = Path(__file__).resolve().parent.parent.parent
+
+    UPLOAD_DIR: Path = BACKEND_DIR / "uploads"
     
     # Model Settings
-    MODELS_DIR: str = "models"
-    VIDEO_MODEL_PATH: str = "models/video_model.pth"
-    IMAGE_MODEL_PATH: str = "models/image_model.pth"
-    AUDIO_MODEL_PATH: str = "models/audio_model.pth"
+    MODELS_DIR: Path = BACKEND_DIR / "models"
+    VIDEO_MODEL_PATH: str = "video_model.pth" # Filename only
+    IMAGE_MODEL_PATH: str = "image_model.pth" # Filename only
+    AUDIO_MODEL_PATH: str = "audio_model.pth" # Filename only
     ENABLE_GPU: bool = True  # Enable GPU acceleration if available
     
     # Processing Settings
@@ -53,7 +59,7 @@ class Settings(BaseSettings):
     
     # Logging Settings
     LOG_LEVEL: str = "INFO"
-    LOG_FILE: str = "logs/app.log"
+    LOG_FILE: Path = BACKEND_DIR / "logs/app.log"
     
     # CORS Settings
     BACKEND_CORS_ORIGINS: List[str] = [
@@ -69,9 +75,23 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [i.strip() for i in v.split(",")]
         return v
+
+    @field_validator("UPLOAD_DIR", "MODELS_DIR", "LOG_FILE", mode="before")
+    @classmethod
+    def ensure_path_strings(cls, v):
+        if isinstance(v, Path):
+            return str(v)
+        return v
     
     model_config = {"env_file": ".env", "case_sensitive": True}
 
 
 # Global settings instance
 settings = Settings()
+
+# Ensure directories exist (this part needs to be run when settings are loaded)
+# For now, main.py handles this. If settings were used before main.py's startup,
+# this would be a good place.
+# settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# settings.MODELS_DIR.mkdir(parents=True, exist_ok=True)
+# Path(settings.LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
