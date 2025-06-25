@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Dict, Any
 import psutil
-import torch
+# import torch
 import time
 from datetime import datetime
 
@@ -51,8 +51,10 @@ async def health_check():
         "cpu_percent": psutil.cpu_percent(),
         "memory_percent": psutil.virtual_memory().percent,
         "disk_percent": psutil.disk_usage('/').percent,
-        "gpu_available": torch.cuda.is_available(),
-        "gpu_count": torch.cuda.device_count() if torch.cuda.is_available() else 0
+        # "gpu_available": torch.cuda.is_available(),
+        # "gpu_count": torch.cuda.device_count() if torch.cuda.is_available() else 0
+        "gpu_available": "N/A (torch disabled)",
+        "gpu_count": 0
     }
     
     return HealthResponse(
@@ -84,24 +86,27 @@ async def detailed_health_check():
         "disk_total": disk.total,
         "disk_free": disk.free,
         "disk_percent": disk.percent,
-        "gpu_available": torch.cuda.is_available(),
-        "gpu_count": torch.cuda.device_count() if torch.cuda.is_available() else 0
+        # "gpu_available": torch.cuda.is_available(),
+        # "gpu_count": torch.cuda.device_count() if torch.cuda.is_available() else 0
+        "gpu_available": "N/A (torch disabled)",
+        "gpu_count": 0
     }
     
     # Add GPU info if available
-    if torch.cuda.is_available():
-        gpu_info = []
-        for i in range(torch.cuda.device_count()):
-            gpu_props = torch.cuda.get_device_properties(i)
-            gpu_memory = torch.cuda.get_device_properties(i).total_memory
-            gpu_info.append({
-                "device_id": i,
-                "name": gpu_props.name,
-                "total_memory": gpu_memory,
-                "memory_allocated": torch.cuda.memory_allocated(i),
-                "memory_reserved": torch.cuda.memory_reserved(i)
-            })
-        system_info["gpu_info"] = gpu_info
+    # if torch.cuda.is_available():
+    #     gpu_info = []
+    #     for i in range(torch.cuda.device_count()):
+    #         gpu_props = torch.cuda.get_device_properties(i)
+    #         gpu_memory = torch.cuda.get_device_properties(i).total_memory
+    #         gpu_info.append({
+    #             "device_id": i,
+    #             "name": gpu_props.name,
+    #             "total_memory": gpu_memory,
+    #             "memory_allocated": torch.cuda.memory_allocated(i),
+    #             "memory_reserved": torch.cuda.memory_reserved(i)
+    #         })
+    #     system_info["gpu_info"] = gpu_info
+    system_info["gpu_info"] = "N/A (torch disabled)"
     
     # Check model status (placeholder - will be implemented with actual models)
     models_status = {

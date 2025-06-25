@@ -23,7 +23,7 @@ from app.core.exceptions import setup_exception_handlers
 
 # Configure logging
 logger.add(
-    "logs/app.log",
+    backend_dir / "logs/app.log",
     rotation="500 MB",
     retention="10 days",
     level="INFO",
@@ -71,8 +71,8 @@ def create_application() -> FastAPI:
     app.include_router(detection.router, prefix="/api/v1", tags=["detection"])
     
     # Mount static files
-    if os.path.exists("uploads"):
-        app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+    if os.path.exists(backend_dir / "uploads"):
+        app.mount("/uploads", StaticFiles(directory=backend_dir / "uploads"), name="uploads")
     
     @app.on_event("startup")
     async def startup_event():
@@ -80,9 +80,9 @@ def create_application() -> FastAPI:
         logger.info("Starting Deepfake Detection API...")
         
         # Create necessary directories
-        os.makedirs("uploads", exist_ok=True)
-        os.makedirs("logs", exist_ok=True)
-        os.makedirs("models", exist_ok=True)
+        os.makedirs(backend_dir / "uploads", exist_ok=True)
+        os.makedirs(backend_dir / "logs", exist_ok=True)
+        os.makedirs(backend_dir / "models", exist_ok=True)
         
         # Initialize models (lazy loading)
         logger.info("Application startup complete")

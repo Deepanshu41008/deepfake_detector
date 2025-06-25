@@ -4,26 +4,26 @@ uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 
 # AI/ML Libraries
-torch==2.5.1
-torchvision==0.20.1
-torchaudio==2.5.1
-tensorflow==2.18.0
-transformers==4.46.3
-opencv-python==4.10.0.84
-librosa==0.10.2
-scikit-learn==1.5.2
+# torch==2.5.1
+# torchvision==0.20.1
+# torchaudio==2.5.1
+# tensorflow==2.18.0
+# transformers==4.46.3
+# opencv-python==4.10.0.84
+# librosa==0.10.2
+# scikit-learn==1.5.2
 numpy==1.26.4
 pillow==10.4.0
 
 # Data Processing
-pandas==2.2.3
-scipy==1.14.1
-matplotlib==3.9.2
-seaborn==0.13.2
+# pandas==2.2.3
+# scipy==1.14.1
+# matplotlib==3.9.2
+# seaborn==0.13.2
 
 # Database
 sqlalchemy==2.0.36
-psycopg2-binary==2.9.10
+# psycopg2-binary==2.9.10 # Assuming sqlite is used for now
 alembic==1.14.0
 
 # Authentication & Security
@@ -37,9 +37,11 @@ python-magic==0.4.27
 
 # Utilities
 pydantic==2.10.3
+pydantic-settings==2.9.1
 python-dotenv==1.0.1
 loguru==0.7.2
 httpx==0.28.1
+psutil==5.9.0
 
 # Testing
 pytest==8.3.4
